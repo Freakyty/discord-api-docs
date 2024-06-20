@@ -80,11 +80,11 @@ Represents a guild or DM channel within Discord.
 
 ###### Channel Flags
 
-| Flag                        | Value   | Description                                                                                                                                                     |
-|-----------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| PINNED                      | 1 << 1  | this thread is pinned to the top of its parent `GUILD_FORUM` or `GUILD_MEDIA` channel                                                                           |
-| REQUIRE_TAG                 | 1 << 4  | whether a tag is required to be specified when creating a thread in a `GUILD_FORUM` or a `GUILD_MEDIA` channel. Tags are specified in the `applied_tags` field. |
-| HIDE_MEDIA_DOWNLOAD_OPTIONS | 1 << 15 | when set hides the embedded media download options. Available only for media channels                                                                           |
+| Flag                        | Value     | Description                                                                                                                                                     |
+|-----------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| PINNED                      | `1 << 1`  | this thread is pinned to the top of its parent `GUILD_FORUM` or `GUILD_MEDIA` channel                                                                           |
+| REQUIRE_TAG                 | `1 << 4`  | whether a tag is required to be specified when creating a thread in a `GUILD_FORUM` or a `GUILD_MEDIA` channel. Tags are specified in the `applied_tags` field. |
+| HIDE_MEDIA_DOWNLOAD_OPTIONS | `1 << 15` | when set hides the embedded media download options. Available only for media channels                                                                           |
 
 ###### Sort Order Types
 
@@ -313,7 +313,6 @@ Represents a message sent in a channel within Discord.
 
 \*\*\*\* This field is only returned for messages with a `type` of `19` (REPLY) or `21` (THREAD_STARTER_MESSAGE). If the message is a reply but the `referenced_message` field is not present, the backend did not attempt to fetch the message that was being replied to, so its state is unknown. If the field exists but is null, the referenced message was deleted.
 
-
 ###### Message Types
 
 > warn
@@ -334,10 +333,10 @@ Represents a message sent in a channel within Discord.
 | GUILD_BOOST_TIER_2                           | 10    | true      |
 | GUILD_BOOST_TIER_3                           | 11    | true      |
 | CHANNEL_FOLLOW_ADD                           | 12    | true      |
-| GUILD_DISCOVERY_DISQUALIFIED                 | 14    | false     |
-| GUILD_DISCOVERY_REQUALIFIED                  | 15    | false     |
-| GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING | 16    | false     |
-| GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING   | 17    | false     |
+| GUILD_DISCOVERY_DISQUALIFIED                 | 14    | true      |
+| GUILD_DISCOVERY_REQUALIFIED                  | 15    | true      |
+| GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING | 16    | true      |
+| GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING   | 17    | true      |
 | THREAD_CREATED                               | 18    | true      |
 | REPLY                                        | 19    | true      |
 | CHAT_INPUT_COMMAND                           | 20    | true      |
@@ -351,7 +350,12 @@ Represents a message sent in a channel within Discord.
 | STAGE_END                                    | 28    | true      |
 | STAGE_SPEAKER                                | 29    | true      |
 | STAGE_TOPIC                                  | 31    | true      |
-| GUILD_APPLICATION_PREMIUM_SUBSCRIPTION       | 32    | false     |
+| GUILD_APPLICATION_PREMIUM_SUBSCRIPTION       | 32    | true      |
+| GUILD_INCIDENT_ALERT_MODE_ENABLED            | 36    | true      |
+| GUILD_INCIDENT_ALERT_MODE_DISABLED           | 37    | true      |
+| GUILD_INCIDENT_REPORT_RAID                   | 38    | true      |
+| GUILD_INCIDENT_REPORT_FALSE_ALARM            | 39    | true      |
+| PURCHASE_NOTIFICATION                        | 44    | true      |
 
 \* Can only be deleted by members with `MANAGE_MESSAGES` permission
 
@@ -373,19 +377,19 @@ Represents a message sent in a channel within Discord.
 
 ###### Message Flags
 
-| Flag                                   | Value   | Description                                                                       |
-|----------------------------------------|---------|-----------------------------------------------------------------------------------|
-| CROSSPOSTED                            | 1 << 0  | this message has been published to subscribed channels (via Channel Following)    |
-| IS_CROSSPOST                           | 1 << 1  | this message originated from a message in another channel (via Channel Following) |
-| SUPPRESS_EMBEDS                        | 1 << 2  | do not include any embeds when serializing this message                           |
-| SOURCE_MESSAGE_DELETED                 | 1 << 3  | the source message for this crosspost has been deleted (via Channel Following)    |
-| URGENT                                 | 1 << 4  | this message came from the urgent message system                                  |
-| HAS_THREAD                             | 1 << 5  | this message has an associated thread, with the same id as the message            |
-| EPHEMERAL                              | 1 << 6  | this message is only visible to the user who invoked the Interaction              |
-| LOADING                                | 1 << 7  | this message is an Interaction Response and the bot is "thinking"                 |
-| FAILED_TO_MENTION_SOME_ROLES_IN_THREAD | 1 << 8  | this message failed to mention some roles and add their members to the thread     |
-| SUPPRESS_NOTIFICATIONS                 | 1 << 12 | this message will not trigger push and desktop notifications                      |
-| IS_VOICE_MESSAGE                       | 1 << 13 | this message is a voice message                                                   |
+| Flag                                   | Value     | Description                                                                       |
+|----------------------------------------|-----------|-----------------------------------------------------------------------------------|
+| CROSSPOSTED                            | `1 << 0`  | this message has been published to subscribed channels (via Channel Following)    |
+| IS_CROSSPOST                           | `1 << 1`  | this message originated from a message in another channel (via Channel Following) |
+| SUPPRESS_EMBEDS                        | `1 << 2`  | do not include any embeds when serializing this message                           |
+| SOURCE_MESSAGE_DELETED                 | `1 << 3`  | the source message for this crosspost has been deleted (via Channel Following)    |
+| URGENT                                 | `1 << 4`  | this message came from the urgent message system                                  |
+| HAS_THREAD                             | `1 << 5`  | this message has an associated thread, with the same id as the message            |
+| EPHEMERAL                              | `1 << 6`  | this message is only visible to the user who invoked the Interaction              |
+| LOADING                                | `1 << 7`  | this message is an Interaction Response and the bot is "thinking"                 |
+| FAILED_TO_MENTION_SOME_ROLES_IN_THREAD | `1 << 8`  | this message failed to mention some roles and add their members to the thread     |
+| SUPPRESS_NOTIFICATIONS                 | `1 << 12` | this message will not trigger push and desktop notifications                      |
+| IS_VOICE_MESSAGE                       | `1 << 13` | this message is a voice message                                                   |
 
 ###### Example Message
 
@@ -627,9 +631,6 @@ The thread metadata object contains a number of thread-specific channel fields t
 
 ###### Thread Metadata Structure
 
-> warn
-> Starting on March 6, threads will be able to be locked and archived independently. Read details about the upcoming changes to the `locked` field in the [Change Log entry](#DOCS_CHANGE_LOG/update-to-locked-threads).
-
 | Field                 | Type               | Description                                                                                                                                |
 |-----------------------|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
 | archived              | boolean            | whether the thread is archived                                                                                                             |
@@ -826,9 +827,9 @@ Embeds are deduplicated by URL.  If a message contains multiple embeds with the 
 
 ###### Attachment Flags
 
-| Flag     | Value  | Description                                                       |
-|----------|--------|-------------------------------------------------------------------|
-| IS_REMIX | 1 << 2 | this attachment has been edited using the remix feature on mobile |
+| Flag     | Value    | Description                                                       |
+|----------|----------|-------------------------------------------------------------------|
+| IS_REMIX | `1 << 2` | this attachment has been edited using the remix feature on mobile |
 
 ### Channel Mention Object
 
