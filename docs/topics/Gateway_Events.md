@@ -49,14 +49,15 @@ Send events are Gateway events encapsulated in an [event payload](#DOCS_TOPICS_G
 > info
 > Previously, Gateway send events were labeled as commands
 
-| Name                                                                       | Description                                               |
-|----------------------------------------------------------------------------|-----------------------------------------------------------|
-| [Identify](#DOCS_TOPICS_GATEWAY_EVENTS/identify)                           | Triggers the initial handshake with the gateway           |
-| [Resume](#DOCS_TOPICS_GATEWAY_EVENTS/resume)                               | Resumes a dropped gateway connection                      |
-| [Heartbeat](#DOCS_TOPICS_GATEWAY_EVENTS/heartbeat)                         | Maintains an active gateway connection                    |
-| [Request Guild Members](#DOCS_TOPICS_GATEWAY_EVENTS/request-guild-members) | Requests members for a guild                              |
-| [Update Voice State](#DOCS_TOPICS_GATEWAY_EVENTS/update-voice-state)       | Joins, moves, or disconnects the app from a voice channel |
-| [Update Presence](#DOCS_TOPICS_GATEWAY_EVENTS/update-presence)             | Updates an app's presence                                 |
+| Name                                                                               | Description                                               |
+|------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| [Identify](#DOCS_TOPICS_GATEWAY_EVENTS/identify)                                   | Triggers the initial handshake with the gateway           |
+| [Resume](#DOCS_TOPICS_GATEWAY_EVENTS/resume)                                       | Resumes a dropped gateway connection                      |
+| [Heartbeat](#DOCS_TOPICS_GATEWAY_EVENTS/heartbeat)                                 | Maintains an active gateway connection                    |
+| [Request Guild Members](#DOCS_TOPICS_GATEWAY_EVENTS/request-guild-members)         | Requests members for a guild                              |
+| [Request Soundboard Sounds](#DOCS_TOPICS_GATEWAY_EVENTS/request-soundboard-sounds) | Requests soundboard sounds in a set of guilds             |
+| [Update Voice State](#DOCS_TOPICS_GATEWAY_EVENTS/update-voice-state)               | Joins, moves, or disconnects the app from a voice channel |
+| [Update Presence](#DOCS_TOPICS_GATEWAY_EVENTS/update-presence)                     | Updates an app's presence                                 |
 
 #### Identify
 
@@ -199,6 +200,27 @@ Due to our privacy and infrastructural concerns with this feature, there are som
 }
 ```
 
+#### Request Soundboard Sounds
+
+Used to request soundboard sounds for a list of guilds. The server will send [Soundboard Sounds](#DOCS_TOPICS_GATEWAY_EVENTS/soundboard-sounds) events for each guild in response.
+
+###### Request Soundboard Sounds Structure
+
+| Field     | Type                | Description                                    |
+|-----------|---------------------|------------------------------------------------|
+| guild_ids | array of snowflakes | IDs of the guilds to get soundboard sounds for |
+
+###### Example Request Soundboard Sounds
+
+```json
+{
+  "op": 31,
+  "d": {
+    "guild_ids": ["613425648685547541", "81384788765712384"]
+  }
+}
+```
+
 #### Update Voice State
 
 Sent when a client wants to join, move, or disconnect from a voice channel.
@@ -316,6 +338,11 @@ Receive events are Gateway events encapsulated in an [event payload](#DOCS_TOPIC
 | [Guild Scheduled Event Delete](#DOCS_TOPICS_GATEWAY_EVENTS/guild-scheduled-event-delete)                     | Guild scheduled event was deleted                                                                                                              |
 | [Guild Scheduled Event User Add](#DOCS_TOPICS_GATEWAY_EVENTS/guild-scheduled-event-user-add)                 | User subscribed to a guild scheduled event                                                                                                     |
 | [Guild Scheduled Event User Remove](#DOCS_TOPICS_GATEWAY_EVENTS/guild-scheduled-event-user-remove)           | User unsubscribed from a guild scheduled event                                                                                                 |
+| [Guild Soundboard Sound Create](#DOCS_TOPICS_GATEWAY_EVENTS/guild-soundboard-sound-create)                   | Guild soundboard sound was created                                                                                                             |
+| [Guild Soundboard Sound Update](#DOCS_TOPICS_GATEWAY_EVENTS/guild-soundboard-sound-update)                   | Guild soundboard sound was updated                                                                                                             |
+| [Guild Soundboard Sound Delete](#DOCS_TOPICS_GATEWAY_EVENTS/guild-soundboard-sound-delete)                   | Guild soundboard sound was deleted                                                                                                             |
+| [Guild Soundboard Sounds Update](#DOCS_TOPICS_GATEWAY_EVENTS/guild-soundboard-sounds-update)                 | Guild soundboard sounds were updated                                                                                                           |
+| [Soundboard Sounds](#DOCS_TOPICS_GATEWAY_EVENTS/soundboard-sounds)                                           | Response to [Request Soundboard Sounds](#DOCS_TOPICS_GATEWAY_EVENTS/request-soundboard-sounds)                                                 |
 | [Integration Create](#DOCS_TOPICS_GATEWAY_EVENTS/integration-create)                                         | Guild integration was created                                                                                                                  |
 | [Integration Update](#DOCS_TOPICS_GATEWAY_EVENTS/integration-update)                                         | Guild integration was updated                                                                                                                  |
 | [Integration Delete](#DOCS_TOPICS_GATEWAY_EVENTS/integration-delete)                                         | Guild integration was deleted                                                                                                                  |
@@ -334,8 +361,12 @@ Receive events are Gateway events encapsulated in an [event payload](#DOCS_TOPIC
 | [Stage Instance Create](#DOCS_TOPICS_GATEWAY_EVENTS/stage-instance-create)                                   | Stage instance was created                                                                                                                     |
 | [Stage Instance Update](#DOCS_TOPICS_GATEWAY_EVENTS/stage-instance-update)                                   | Stage instance was updated                                                                                                                     |
 | [Stage Instance Delete](#DOCS_TOPICS_GATEWAY_EVENTS/stage-instance-delete)                                   | Stage instance was deleted or closed                                                                                                           |
+| [Subscription Create](#DOCS_TOPICS_GATEWAY_EVENTS/subscription-create)                                       | Premium App Subscription was created                                                                                                           |
+| [Subscription Update](#DOCS_TOPICS_GATEWAY_EVENTS/subscription-update)                                       | Premium App Subscription was updated                                                                                                           |
+| [Subscription Delete](#DOCS_TOPICS_GATEWAY_EVENTS/subscription-delete)                                       | Premium App Subscription was deleted                                                                                                           |
 | [Typing Start](#DOCS_TOPICS_GATEWAY_EVENTS/typing-start)                                                     | User started typing in a channel                                                                                                               |
 | [User Update](#DOCS_TOPICS_GATEWAY_EVENTS/user-update)                                                       | Properties about the user changed                                                                                                              |
+| [Voice Channel Effect Send](#DOCS_TOPICS_GATEWAY_EVENTS/voice-channel-effect-send)                           | Someone sent an effect in a voice channel the current user is connected to                                                                     |
 | [Voice State Update](#DOCS_TOPICS_GATEWAY_EVENTS/voice-state-update)                                         | Someone joined, left, or moved a voice channel                                                                                                 |
 | [Voice Server Update](#DOCS_TOPICS_GATEWAY_EVENTS/voice-server-update)                                       | Guild's voice server was updated                                                                                                               |
 | [Webhooks Update](#DOCS_TOPICS_GATEWAY_EVENTS/webhooks-update)                                               | Guild channel webhook was created, update, or deleted                                                                                          |
@@ -552,15 +583,33 @@ Sent when a message is pinned or unpinned in a text channel. This is not sent wh
 
 #### Entitlement Create
 
-Sent when an entitlement is created. The inner payload is an [entitlement](#DOCS_MONETIZATION_ENTITLEMENTS/entitlement-object) object.
+> danger
+> Starting on October 1st, 2024, the `ENTITLEMENT_CREATE` event will have an `ends_at` value of null. Please see the [Change Log and Entitlement Migration Guide](#DOCS_CHANGE_LOG/subscription-api-and-entitlement-migration) for more information.
+
+Sent when an entitlement is created. The inner payload is an [entitlement](#DOCS_RESOURCES_ENTITLEMENT/entitlement-object) object.
 
 #### Entitlement Update
 
-Sent when an entitlement is updated. The inner payload is an [entitlement](#DOCS_MONETIZATION_ENTITLEMENTS/entitlement-object) object. When an entitlement for a subscription is renewed, the `ends_at` field may have an updated value with the new expiration date.
+> danger
+> Starting on October 1, 2024, the `ENTITLEMENT_UPDATE` event behavior will be changing. You will no longer receive an `ENTITLEMENT_UPDATE` event on successful renewal When a user cancels, you will receive an `ENTITLEMENT_UPDATE` events with an `ends_at` value when the subscription ends. See the [Change Log and Entitlement Migration Guide](#DOCS_CHANGE_LOG/subscription-api-and-entitlement-migration) for more information.
+
+Sent when an entitlement is updated. The inner payload is an [entitlement](#DOCS_RESOURCES_ENTITLEMENT/entitlement-object) object. 
+
+For subscription entitlements, when a user's subscription is renewed you will receive an `ENTITLEMENT_UPDATE` event with a new `ends_at` date that reflects the end of the new billing period.
+
+If a user cancels their subscription, you will stop receiving `ENTITLEMENT_UPDATE` events that update the `ends_at` value.
 
 #### Entitlement Delete
 
-Sent when an entitlement is deleted. The inner payload is an [entitlement](#DOCS_MONETIZATION_ENTITLEMENTS/entitlement-object) object. Entitlements are not deleted when they expire.
+Sent when an entitlement is deleted. The inner payload is an [entitlement](#DOCS_RESOURCES_ENTITLEMENT/entitlement-object) object. 
+
+Entitlement deletions are infrequent, and occur when:
+
+- Discord issues a refund for a subscription
+- Discord removes an entitlement from a user via internal tooling
+- Discord deletes an app-managed entitlement they created via the API
+
+Entitlements are _not_ deleted when they expire.
 
 ### Guilds
 
@@ -595,6 +644,7 @@ The inner payload can be:
 | presences              | array of partial [presence update](#DOCS_TOPICS_GATEWAY_EVENTS/presence-update) objects                      | Presences of the members in the guild, will only include non-offline members if the size is greater than `large threshold` |
 | stage_instances        | array of [stage instance](#DOCS_RESOURCES_STAGE_INSTANCE/stage-instance-object) objects                      | Stage instances in the guild                                                                                               |
 | guild_scheduled_events | array of [guild scheduled event](#DOCS_RESOURCES_GUILD_SCHEDULED_EVENT/guild-scheduled-event-object) objects | Scheduled events in the guild                                                                                              |
+| soundboard_sounds      | array of [soundboard sound](#DOCS_RESOURCES_SOUNDBOARD/soundboard-sound-object) objects                      | Soundboard sounds in the guild                                                                                             |
 
 > warn
 > If your bot does not have the `GUILD_PRESENCES` [Gateway Intent](#DOCS_TOPICS_GATEWAY/gateway-intents), or if the guild has over 75k members, members and presences returned in this event will only contain your bot and users in voice channels.
@@ -773,19 +823,19 @@ Sent when a guild role is deleted.
 | guild_id | snowflake | ID of the guild |
 | role_id  | snowflake | ID of the role  |
 
-### Guild Scheduled Event Create
+#### Guild Scheduled Event Create
 
 Sent when a guild scheduled event is created. The inner payload is a [guild scheduled event](#DOCS_RESOURCES_GUILD_SCHEDULED_EVENT/guild-scheduled-event-object) object.
 
-### Guild Scheduled Event Update
+#### Guild Scheduled Event Update
 
 Sent when a guild scheduled event is updated. The inner payload is a [guild scheduled event](#DOCS_RESOURCES_GUILD_SCHEDULED_EVENT/guild-scheduled-event-object) object.
 
-### Guild Scheduled Event Delete
+#### Guild Scheduled Event Delete
 
 Sent when a guild scheduled event is deleted. The inner payload is a [guild scheduled event](#DOCS_RESOURCES_GUILD_SCHEDULED_EVENT/guild-scheduled-event-object) object.
 
-### Guild Scheduled Event User Add
+#### Guild Scheduled Event User Add
 
 Sent when a user has subscribed to a guild scheduled event.
 
@@ -797,7 +847,7 @@ Sent when a user has subscribed to a guild scheduled event.
 | user_id                  | snowflake | ID of the user                  |
 | guild_id                 | snowflake | ID of the guild                 |
 
-### Guild Scheduled Event User Remove
+#### Guild Scheduled Event User Remove
 
 Sent when a user has unsubscribed from a guild scheduled event.
 
@@ -808,6 +858,40 @@ Sent when a user has unsubscribed from a guild scheduled event.
 | guild_scheduled_event_id | snowflake | ID of the guild scheduled event |
 | user_id                  | snowflake | ID of the user                  |
 | guild_id                 | snowflake | ID of the guild                 |
+
+#### Guild Soundboard Sound Create
+
+Sent when a guild soundboard sound is created. The inner payload is a [soundboard sound](#DOCS_RESOURCES_SOUNDBOARD/soundboard-sound-object) object.
+
+#### Guild Soundboard Sound Update
+
+Sent when a guild soundboard sound is updated. The inner payload is a [soundboard sound](#DOCS_RESOURCES_SOUNDBOARD/soundboard-sound-object) object.
+
+#### Guild Soundboard Sound Delete
+
+Sent when a guild soundboard sound is deleted.
+
+###### Guild Soundboard Sound Delete Event Fields
+
+| Field    | Type      | Description                      |
+|----------|-----------|----------------------------------|
+| sound_id | snowflake | ID of the sound that was deleted |
+| guild_id | snowflake | ID of the guild the sound was in |
+
+#### Guild Soundboard Sounds Update
+
+Sent when multiple guild soundboard sounds are updated. The inner payload is an array of [soundboard sound](#DOCS_RESOURCES_SOUNDBOARD/soundboard-sound-object) objects.
+
+#### Soundboard Sounds
+
+Includes a guild's list of soundboard sounds. Sent in response to [Request Soundboard Sounds](#DOCS_TOPICS_GATEWAY_EVENTS/request-soundboard-sounds).
+
+###### Soundboard Sounds Event Fields
+
+| Field             | Type                                                                                    | Description                   |
+|-------------------|-----------------------------------------------------------------------------------------|-------------------------------|
+| soundboard_sounds | array of [soundboard sound](#DOCS_RESOURCES_SOUNDBOARD/soundboard-sound-object) objects | The guild's soundboard sounds |
+| guild_id          | snowflake                                                                               | ID of the guild               |
 
 ### Integrations
 
@@ -887,7 +971,7 @@ Sent when an invite is deleted.
 
 #### Message Create
 
-Sent when a message is created. The inner payload is a [message](#DOCS_RESOURCES_CHANNEL/message-object) object with the following extra fields:
+Sent when a message is created. The inner payload is a [message](#DOCS_RESOURCES_MESSAGE/message-object) object with the following extra fields:
 
 ###### Message Create Extra Fields
 
@@ -899,10 +983,10 @@ Sent when a message is created. The inner payload is a [message](#DOCS_RESOURCES
 
 #### Message Update
 
-Sent when a message is updated. The inner payload is a [message](#DOCS_RESOURCES_CHANNEL/message-object) object with the same extra fields as [MESSAGE_CREATE](#DOCS_TOPICS_GATEWAY_EVENTS/message-create).
+Sent when a message is updated. The inner payload is a [message](#DOCS_RESOURCES_MESSAGE/message-object) object with the same extra fields as [MESSAGE_CREATE](#DOCS_TOPICS_GATEWAY_EVENTS/message-create).
 
 > warn
-> Unlike creates, message updates may contain only a subset of the full message object payload (but will always contain an ID and channel_id).
+> The value for `tts` will always be false in message updates.
 
 #### Message Delete
 
@@ -945,7 +1029,7 @@ Sent when a user adds a reaction to a message.
 | message_author_id? | snowflake                                                    | ID of the user who authored the message which was reacted to                               |
 | burst              | boolean                                                      | true if this is a super-reaction                                                           |
 | burst_colors?      | array of strings                                             | Colors used for super-reaction animation in "#rrggbb" format                               |
-| type               | integer                                                      | The [type of reaction](#DOCS_RESOURCES_CHANNEL/get-reactions-reaction-types)               |
+| type               | integer                                                      | The [type of reaction](#DOCS_RESOURCES_MESSAGE/get-reactions-reaction-types)               |
 
 #### Message Reaction Remove
 
@@ -961,7 +1045,7 @@ Sent when a user removes a reaction from a message.
 | guild_id?  | snowflake                                                    | ID of the guild                                                                            |
 | emoji      | a partial [emoji](#DOCS_RESOURCES_EMOJI/emoji-object) object | Emoji used to react - [example](#DOCS_RESOURCES_EMOJI/emoji-object-standard-emoji-example) |
 | burst      | boolean                                                      | true if this was a super-reaction                                                          |
-| type       | integer                                                      | The [type of reaction](#DOCS_RESOURCES_CHANNEL/get-reactions-reaction-types)               |
+| type       | integer                                                      | The [type of reaction](#DOCS_RESOURCES_MESSAGE/get-reactions-reaction-types)               |
 
 #### Message Reaction Remove All
 
@@ -1049,7 +1133,7 @@ Active sessions are indicated with an "online", "idle", or "dnd" string per plat
 
 | ID | Name      | Format              | Example                              |
 |----|-----------|---------------------|--------------------------------------|
-| 0  | Game      | Playing {name}      | "Playing Rocket League"              |
+| 0  | Playing   | Playing {name}      | "Playing Rocket League"              |
 | 1  | Streaming | Streaming {details} | "Streaming Rocket League"            |
 | 2  | Listening | Listening to {name} | "Listening to Spotify"               |
 | 3  | Watching  | Watching {name}     | "Watching YouTube Together"          |
@@ -1065,6 +1149,9 @@ Active sessions are indicated with an "online", "idle", or "dnd" string per plat
 |--------|---------|----------------------------------------------------------|
 | start? | integer | Unix time (in milliseconds) of when the activity started |
 | end?   | integer | Unix time (in milliseconds) of when the activity ends    |
+
+> info
+> For Listening and Watching activities, you can include both start and end timestamps to display a time bar.
 
 ###### Activity Emoji
 
@@ -1197,6 +1284,30 @@ Sent when properties about the current bot's user change. Inner payload is a [us
 
 ### Voice
 
+#### Voice Channel Effect Send
+
+Sent when someone sends an effect, such as an emoji reaction or a soundboard sound, in a voice channel the current user is connected to.
+
+###### Voice Channel Effect Send Event Fields
+
+| Field           | Type                                                | Description                                                                                                                                     |
+|-----------------|-----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| channel_id      | snowflake                                           | ID of the channel the effect was sent in                                                                                                        |
+| guild_id        | snowflake                                           | ID of the guild the effect was sent in                                                                                                          |
+| user_id         | snowflake                                           | ID of the user who sent the effect                                                                                                              |
+| emoji?          | ?[emoji](#DOCS_RESOURCES_EMOJI/emoji-object) object | The emoji sent, for emoji reaction and soundboard effects                                                                                       |
+| animation_type? | ?integer                                            | The [type of emoji animation](#DOCS_TOPICS_GATEWAY_EVENTS/voice-channel-effect-send-animation-types), for emoji reaction and soundboard effects |
+| animation_id?   | integer                                             | The ID of the emoji animation, for emoji reaction and soundboard effects                                                                        |
+| sound_id?       | snowflake or integer                                | The ID of the soundboard sound, for soundboard effects                                                                                          |
+| sound_volume?   | double                                              | The volume of the soundboard sound, from 0 to 1, for soundboard effects                                                                         |
+
+###### Animation Types
+
+| Type    | Value | Description                                 |
+|---------|-------|---------------------------------------------|
+| PREMIUM | 0     | A fun animation, sent by a Nitro subscriber |
+| BASIC   | 1     | The standard animation                      |
+
 #### Voice State Update
 
 Sent when someone joins/leaves/moves voice channels. Inner payload is a [voice state](#DOCS_RESOURCES_VOICE/voice-state-object) object.
@@ -1258,6 +1369,25 @@ Sent when a [Stage instance](#DOCS_RESOURCES_STAGE_INSTANCE) has been updated. I
 #### Stage Instance Delete
 
 Sent when a [Stage instance](#DOCS_RESOURCES_STAGE_INSTANCE) has been deleted (i.e. the Stage has been closed). Inner payload is a [Stage instance](#DOCS_RESOURCES_STAGE_INSTANCE/stage-instance-object)
+
+### Subscriptions
+
+#### Subscription Create
+
+> info
+> Subscription status should not be used to grant perks. Use [entitlements](#DOCS_RESOURCES_ENTITLEMENT/entitlement-object) as an indication of whether a user should have access to a specific SKU. See our guide on [Implementing App Subscriptions](#DOCS_MONETIZATION_IMPLEMENTING_APP_SUBSCRIPTIONS) for more information.
+
+Sent when a [Subscription](#DOCS_RESOURCES_SUBSCRIPTION) for a Premium App is created. Inner payload is a [Subscription](#DOCS_RESOURCES_SUBSCRIPTION/subscription-object).
+
+A Subscription's `status` can be either **inactive** or **active** when this event is received. You will receive subsequent `SUBSCRIPTION_UPDATE` events if the `status` is updated to **active**. As a best practice, you should not grant any perks to users until the entitlements are created.
+
+#### Subscription Update
+
+Sent when a [Subscription](#DOCS_RESOURCES_SUBSCRIPTION) for a Premium App has been updated. Inner payload is a [Subscription](#DOCS_RESOURCES_SUBSCRIPTION/subscription-object) object.
+
+#### Subscription Delete
+
+Sent when a [Subscription](#DOCS_RESOURCES_SUBSCRIPTION) for a Premium App has been deleted. Inner payload is a [Subscription](#DOCS_RESOURCES_SUBSCRIPTION/subscription-object) object.
 
 ### Polls
 

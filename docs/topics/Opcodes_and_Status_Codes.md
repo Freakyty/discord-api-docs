@@ -6,19 +6,20 @@ All gateway events in Discord are tagged with an opcode that denotes the payload
 
 ###### Gateway Opcodes
 
-| Code | Name                  | Client Action | Description                                                                             |
-|------|-----------------------|---------------|-----------------------------------------------------------------------------------------|
-| 0    | Dispatch              | Receive       | An event was dispatched.                                                                |
-| 1    | Heartbeat             | Send/Receive  | Fired periodically by the client to keep the connection alive.                          |
-| 2    | Identify              | Send          | Starts a new session during the initial handshake.                                      |
-| 3    | Presence Update       | Send          | Update the client's presence.                                                           |
-| 4    | Voice State Update    | Send          | Used to join/leave or move between voice channels.                                      |
-| 6    | Resume                | Send          | Resume a previous session that was disconnected.                                        |
-| 7    | Reconnect             | Receive       | You should attempt to reconnect and resume immediately.                                 |
-| 8    | Request Guild Members | Send          | Request information about offline guild members in a large guild.                       |
-| 9    | Invalid Session       | Receive       | The session has been invalidated. You should reconnect and identify/resume accordingly. |
-| 10   | Hello                 | Receive       | Sent immediately after connecting, contains the `heartbeat_interval` to use.            |
-| 11   | Heartbeat ACK         | Receive       | Sent in response to receiving a heartbeat to acknowledge that it has been received.     |
+| Code | Name                      | Client Action | Description                                                                             |
+|------|---------------------------|---------------|-----------------------------------------------------------------------------------------|
+| 0    | Dispatch                  | Receive       | An event was dispatched.                                                                |
+| 1    | Heartbeat                 | Send/Receive  | Fired periodically by the client to keep the connection alive.                          |
+| 2    | Identify                  | Send          | Starts a new session during the initial handshake.                                      |
+| 3    | Presence Update           | Send          | Update the client's presence.                                                           |
+| 4    | Voice State Update        | Send          | Used to join/leave or move between voice channels.                                      |
+| 6    | Resume                    | Send          | Resume a previous session that was disconnected.                                        |
+| 7    | Reconnect                 | Receive       | You should attempt to reconnect and resume immediately.                                 |
+| 8    | Request Guild Members     | Send          | Request information about offline guild members in a large guild.                       |
+| 9    | Invalid Session           | Receive       | The session has been invalidated. You should reconnect and identify/resume accordingly. |
+| 10   | Hello                     | Receive       | Sent immediately after connecting, contains the `heartbeat_interval` to use.            |
+| 11   | Heartbeat ACK             | Receive       | Sent in response to receiving a heartbeat to acknowledge that it has been received.     |
+| 31   | Request Soundboard Sounds | Send          | Request information about soundboard sounds in a set of guilds.                         |
 
 ###### Gateway Close Event Codes
 
@@ -30,7 +31,7 @@ In order to prevent broken reconnect loops, you should consider some close codes
 | 4000 | Unknown error         | We're not sure what went wrong. Try reconnecting?                                                                                                                                                                                | true      |
 | 4001 | Unknown opcode        | You sent an invalid [Gateway opcode](#DOCS_TOPICS_OPCODES_AND_STATUS_CODES/gateway-gateway-opcodes) or an invalid payload for an opcode. Don't do that!                                                                          | true      |
 | 4002 | Decode error          | You sent an invalid [payload](#DOCS_TOPICS_GATEWAY/sending-events) to Discord. Don't do that!                                                                                                                                    | true      |
-| 4003 | Not authenticated     | You sent us a payload prior to [identifying](#DOCS_TOPICS_GATEWAY/identifying).                                                                                                                                                  | true      |
+| 4003 | Not authenticated     | You sent us a payload prior to [identifying](#DOCS_TOPICS_GATEWAY/identifying), or this session has been invalidated.                                                                                                            | true      |
 | 4004 | Authentication failed | The account token sent with your [identify payload](#DOCS_TOPICS_GATEWAY_EVENTS/identify) is incorrect.                                                                                                                          | false     |
 | 4005 | Already authenticated | You sent more than one identify payload. Don't do that!                                                                                                                                                                          | true      |
 | 4007 | Invalid `seq`         | The sequence sent when [resuming](#DOCS_TOPICS_GATEWAY_EVENTS/resume) the session was invalid. Reconnect and start a new session.                                                                                                | true      |
@@ -48,19 +49,31 @@ Our voice gateways have their own set of opcodes and close codes.
 
 ###### Voice Opcodes
 
-| Code | Name                | Sent By           | Description                                              |
-|------|---------------------|-------------------|----------------------------------------------------------|
-| 0    | Identify            | client            | Begin a voice websocket connection.                      |
-| 1    | Select Protocol     | client            | Select the voice protocol.                               |
-| 2    | Ready               | server            | Complete the websocket handshake.                        |
-| 3    | Heartbeat           | client            | Keep the websocket connection alive.                     |
-| 4    | Session Description | server            | Describe the session.                                    |
-| 5    | Speaking            | client and server | Indicate which users are speaking.                       |
-| 6    | Heartbeat ACK       | server            | Sent to acknowledge a received client heartbeat.         |
-| 7    | Resume              | client            | Resume a connection.                                     |
-| 8    | Hello               | server            | Time to wait between sending heartbeats in milliseconds. |
-| 9    | Resumed             | server            | Acknowledge a successful session resume.                 |
-| 13   | Client Disconnect   | server            | A client has disconnected from the voice channel         |
+| Code | Name                                | Sent By           | Description                                              | Binary |
+|------|-------------------------------------|-------------------|----------------------------------------------------------|--------|
+| 0    | Identify                            | client            | Begin a voice websocket connection.                      |        |
+| 1    | Select Protocol                     | client            | Select the voice protocol.                               |        |
+| 2    | Ready                               | server            | Complete the websocket handshake.                        |        |
+| 3    | Heartbeat                           | client            | Keep the websocket connection alive.                     |        |
+| 4    | Session Description                 | server            | Describe the session.                                    |        |
+| 5    | Speaking                            | client and server | Indicate which users are speaking.                       |        |
+| 6    | Heartbeat ACK                       | server            | Sent to acknowledge a received client heartbeat.         |        |
+| 7    | Resume                              | client            | Resume a connection.                                     |        |
+| 8    | Hello                               | server            | Time to wait between sending heartbeats in milliseconds. |        |
+| 9    | Resumed                             | server            | Acknowledge a successful session resume.                 |        |
+| 11   | Clients Connect                     | server            | One or more clients have connected to the voice channel  |        |
+| 13   | Client Disconnect                   | server            | A client has disconnected from the voice channel         |        |
+| 21   | DAVE Prepare Transition             | server            | A downgrade from the DAVE protocol is upcoming           |        |
+| 22   | DAVE Execute Transition             | server            | Execute a previously announced protocol transition       |        |
+| 23   | DAVE Transition Ready               | client            | Acknowledge readiness previously announced transition    |        |
+| 24   | DAVE Prepare Epoch                  | server            | A DAVE protocol version or group change is upcoming      |        |
+| 25   | DAVE MLS External Sender            | server            | Credential and public key for MLS external sender        | X      |
+| 26   | DAVE MLS Key Package                | client            | MLS Key Package for pending group member                 | X      |
+| 27   | DAVE MLS Proposals                  | server            | MLS Proposals to be appended or revoked                  | X      |
+| 28   | DAVE MLS Commit Welcome             | client            | MLS Commit with optional MLS Welcome messages            | X      |
+| 29   | DAVE MLS Announce Commit Transition | server            | MLS Commit to be processed for upcoming transition       |        |
+| 30   | DAVE MLS Welcome                    | server            | MLS Welcome to group for upcoming transition             | X      |
+| 31   | DAVE MLS Invalid Commit Welcome     | client            | Flag invalid commit or welcome, request re-add           |        |
 
 ###### Voice Close Event Codes
 
@@ -77,7 +90,7 @@ Our voice gateways have their own set of opcodes and close codes.
 | 4012 | Unknown protocol         | We didn't recognize the [protocol](#DOCS_TOPICS_VOICE_CONNECTIONS/establishing-a-voice-udp-connection-example-select-protocol-payload) you sent. |
 | 4014 | Disconnected             | Channel was deleted, you were kicked, voice server changed, or the main gateway session was dropped. Should not reconnect.                       |
 | 4015 | Voice server crashed     | The server crashed. Our bad! Try [resuming](#DOCS_TOPICS_VOICE_CONNECTIONS/resuming-voice-connection).                                           |
-| 4016 | Unknown encryption mode  | We didn't recognize your [encryption](#DOCS_TOPICS_VOICE_CONNECTIONS/encrypting-and-sending-voice).                                              |
+| 4016 | Unknown encryption mode  | We didn't recognize your [encryption](#DOCS_TOPICS_VOICE_CONNECTIONS/transport-encryption-and-sending-voice).                                    |
 
 ## HTTP
 
@@ -126,6 +139,7 @@ Along with the HTTP error code, our API can also return more detailed error code
 | 10015  | Unknown webhook                                                                                                               |
 | 10016  | Unknown webhook service                                                                                                       |
 | 10020  | Unknown session                                                                                                               |
+| 10021  | Unknown Asset                                                                                                                 |
 | 10026  | Unknown ban                                                                                                                   |
 | 10027  | Unknown SKU                                                                                                                   |
 | 10028  | Unknown Store Listing                                                                                                         |
@@ -141,6 +155,7 @@ Along with the HTTP error code, our API can also return more detailed error code
 | 10057  | Unknown guild template                                                                                                        |
 | 10059  | Unknown discoverable server category                                                                                          |
 | 10060  | Unknown sticker                                                                                                               |
+| 10061  | Unknown sticker pack                                                                                                          |
 | 10062  | Unknown interaction                                                                                                           |
 | 10063  | Unknown application command                                                                                                   |
 | 10065  | Unknown voice state                                                                                                           |
@@ -151,6 +166,7 @@ Along with the HTTP error code, our API can also return more detailed error code
 | 10070  | Unknown Guild Scheduled Event                                                                                                 |
 | 10071  | Unknown Guild Scheduled Event User                                                                                            |
 | 10087  | Unknown Tag                                                                                                                   |
+| 10097  | Unknown sound                                                                                                                 |
 | 20001  | Bots cannot use this endpoint                                                                                                 |
 | 20002  | Only bots can use this endpoint                                                                                               |
 | 20009  | Explicit content cannot be sent to the desired recipient(s)                                                                   |
@@ -188,6 +204,7 @@ Along with the HTTP error code, our API can also return more detailed error code
 | 30039  | Maximum number of stickers reached                                                                                            |
 | 30040  | Maximum number of prune requests has been reached. Try again later                                                            |
 | 30042  | Maximum number of guild widget settings updates has been reached. Try again later                                             |
+| 30045  | Maximum number of soundboard sounds reached                                                                                   |
 | 30046  | Maximum number of edits to messages older than 1 hour reached. Try again later                                                |
 | 30047  | Maximum number of pinned threads in a forum channel has been reached                                                          |
 | 30048  | Maximum number of tags in a forum channel has been reached                                                                    |
@@ -204,6 +221,8 @@ Along with the HTTP error code, our API can also return more detailed error code
 | 40006  | This feature has been temporarily disabled server-side                                                                        |
 | 40007  | The user is banned from this guild                                                                                            |
 | 40012  | Connection has been revoked                                                                                                   |
+| 40018  | Only consumable SKUs can be consumed                                                                                          |
+| 40019  | You can only delete sandbox entitlements.                                                                                     |
 | 40032  | Target user is not connected to voice                                                                                         |
 | 40033  | This message has already been crossposted                                                                                     |
 | 40041  | An application command with that name already exists                                                                          |
@@ -215,6 +234,7 @@ Along with the HTTP error code, our API can also return more detailed error code
 | 40066  | There are no tags available that can be set by non-moderators                                                                 |
 | 40067  | A tag is required to create a forum post in this channel                                                                      |
 | 40074  | An entitlement has already been granted for this resource                                                                     |
+| 40094  | This interaction has hit the maximum number of follow up messages                                                             |
 | 40333  | Cloudflare is blocking your request. This can often be resolved by setting a proper [User Agent](#DOCS_REFERENCE/user-agent)  |
 | 50001  | Missing access                                                                                                                |
 | 50002  | Invalid account type                                                                                                          |
@@ -268,12 +288,16 @@ Along with the HTTP error code, our API can also return more detailed error code
 | 50097  | This server needs monetization enabled in order to perform this action                                                        |
 | 50101  | This server needs more boosts to perform this action                                                                          |
 | 50109  | The request body contains invalid JSON.                                                                                       |
+| 50110  | The provided file is invalid.                                                                                                 |
+| 50123  | The provided file type is invalid.                                                                                            |
+| 50124  | The provided file duration exceeds maximum of 5.2 seconds.                                                                    |
 | 50131  | Owner cannot be pending member                                                                                                |
 | 50132  | Ownership cannot be transferred to a bot user                                                                                 |
 | 50138  | Failed to resize asset below the maximum size: 262144                                                                         |
 | 50144  | Cannot mix subscription and non subscription roles for an emoji                                                               |
 | 50145  | Cannot convert between premium emoji and normal emoji                                                                         |
 | 50146  | Uploaded file not found.                                                                                                      |
+| 50151  | The specified emoji is invalid                                                                                                |
 | 50159  | Voice messages do not support additional content.                                                                             |
 | 50160  | Voice messages must have a single audio attachment.                                                                           |
 | 50161  | Voice messages must have supporting metadata.                                                                                 |
@@ -281,6 +305,7 @@ Along with the HTTP error code, our API can also return more detailed error code
 | 50163  | Cannot delete guild subscription integration                                                                                  |
 | 50173  | You cannot send voice messages in this channel.                                                                               |
 | 50178  | The user account must first be verified                                                                                       |
+| 50192  | The provided file does not have a valid duration.                                                                             |
 | 50600  | You do not have permission to send this sticker.                                                                              |
 | 60003  | Two factor is required for this operation                                                                                     |
 | 80004  | No users with DiscordTag exist                                                                                                |
